@@ -43,7 +43,7 @@
 
 
 let scene, camera, renderer, light, background, controls
-let diffusEnvMap, deepEnvMap
+let diffusEnvMap, deepEnvMap, iterDiffusEnvMap
 let gui
 const roughMaterialParam = {		
     envMapIntensity: 1.0,
@@ -64,15 +64,6 @@ init();
 render();
 
 function init(){
-
-/*var csv_file = new File('depth/1_depth1.csv');
-csv_file.open('r');
-csv_file.encoding = 'utf-8';
-var data = csv_file.read().split('/\r\n|\n/'); // split by lines
-csv_file.close();
-for (var row in data) data[row].split(','); // split all lines by comas
-
-alert(data); // here is your 2d array*/
 
   scene = new THREE.Scene();
   
@@ -122,23 +113,17 @@ new THREE.TextureLoader().load('Frames/'+ imageName +'.png', function(texture){
   
   let diffusEnvPath = diffuseLight + imageName + '.exr';
   let deepEnvPath = deepLight + imageName + '.exr';
-  let clipEnvPath = 'clip_env/' + imageName + '.exr';
+  let iterDiffusEnvPath = 'envMap_DiffusionLight_iter/' + imageName + '.exr';
 
- /* diffusEnvMap = EXRLoader().load(diffusEnvPath, function ( texture ) {
-    texture.mapping = THREE.EquirectangularReflectionMapping;
-    diffusEnvMap = texture;
-} );*/
+
 diffusEnvMap = new EXRLoader().load(diffusEnvPath)
 diffusEnvMap.mapping = THREE.EquirectangularReflectionMapping;
 
 deepEnvMap = new EXRLoader().load(deepEnvPath)
 deepEnvMap.mapping = THREE.EquirectangularReflectionMapping;
 
-/*
-new EXRLoader().load(deepEnvPath, function ( texture ) {
-    roughMaterial.map = texture;
-    metalMaterial.map = texture;
-} );*/
+iterDiffusEnvMap = new EXRLoader().load(iterDiffusEnvPath)
+iterDiffusEnvMap.mapping = THREE.EquirectangularReflectionMapping;
 
 let roughObj = new THREE.Mesh( geometry, roughMaterial );
   roughObj.castShadow = true;
@@ -182,7 +167,8 @@ const guiParams ={
   const envMapsOptions = {
     'none': null,
       'DiffusionLight': diffusEnvMap,
-      'Deep Panorama': deepEnvMap
+      'Deep Panorama': deepEnvMap,
+      'DiffusionLight(iteration)': iterDiffusEnvMap
     }
 
   gui = new GUI();
